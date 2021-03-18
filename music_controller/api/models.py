@@ -1,6 +1,8 @@
 from django.db import models
 import random, string
 
+
+
 def generate_unique_code():
     """
     Get a unique code for a room when created
@@ -12,8 +14,15 @@ def generate_unique_code():
         # if there is no room (filter by code field) i.e., count of rooms with code is 0 for the code we generated
         # we are good to go
         if not Room.objects.filter(code=code).count(): break
+    return code
+
 
 # Create your models here.
+"""
+CALL python manage.py makemigrations in terminal whenever ANY of these models are updated before running server!!
+"""
+
+
 class Room(models.Model):
     code = models.CharField(max_length=8, default=generate_unique_code, unique=True)
     # cardinality is room can have only 1 host
