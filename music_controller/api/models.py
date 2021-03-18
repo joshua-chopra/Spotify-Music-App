@@ -15,7 +15,7 @@ def generate_unique_code():
 
 # Create your models here.
 class Room(models.Model):
-    code = models.CharField(max_length=8, default="", unique=True)
+    code = models.CharField(max_length=8, default=generate_unique_code, unique=True)
     # cardinality is room can have only 1 host
     host = models.CharField(max_length=50, unique=True)
     # non-null attribute, by default guest cannot pause music.
