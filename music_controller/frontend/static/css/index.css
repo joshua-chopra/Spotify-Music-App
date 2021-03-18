@@ -1,0 +1,23 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /*color: white;*/
+}
+
+/*wraps app div, fixed position no scroll bars and put at top left of page*/
+#main {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+
+/* recall use # to refer for elements with specific 'id', i.e., #id_name */
+#app {
+    width: 100%;
+    height: 100%;
+    /* components we're using make use of flexgrid in CSS. */
+    display: flex;
+}

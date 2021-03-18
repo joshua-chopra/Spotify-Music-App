@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import RoomView
+from .views import RoomView, CreateRoomView
 
 urlpatterns = [
-    # call main() for blank URL endpoint, where prefix from urls.py (other module) is ''.
-    # so this path literally handles url '' (nothing following it). If we did something like 'api', include(urls.py)
-    # then did path('home', main) this would mean that api/home endpoint will call main function
-    path('home/', RoomView.as_view())
+    # register RoomView obj to home URL, returns serialized JSON format since we used serializer on our RoomView class.
+    path('home/', RoomView.as_view()),
+    # register CreateRoomView obj to create-room url, we will handle POST request at this URL which can create a room.
+    path('create-room', CreateRoomView.as_view())
 ]
