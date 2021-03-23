@@ -6,8 +6,9 @@ Deal with any urls starting with /api since project level (music-controller) dir
 module, and we register the corresponding views of the DB here. 
 """
 urlpatterns = [
-    # register RoomView obj to home URL, returns serialized JSON format since we used serializer on our RoomView class.
-    path('home/', RoomView.as_view()),
+    # register RoomView obj to room URL, returns serialized JSON format since we used serializer on our RoomView class.
+    path('room', RoomView.as_view()),
     # register CreateRoomView obj to create-room url, we will handle POST request at this URL which can create a room.
-    path('create-room', CreateRoomView.as_view())
+    path('create-room', CreateRoomView.as_view()),
+    path('get-room', GetRoom.as_view())
 ]
