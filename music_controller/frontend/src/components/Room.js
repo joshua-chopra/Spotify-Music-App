@@ -9,12 +9,16 @@ export default class Room extends Component {
       guestCanPause: false,
       isHost: false,
     };
+    // Router passes props about URL that matched from HomePage.js, grab parameters out of URL to send to api to get
+    // room with associated code, since on front end the path to display Room.js is room/:roomCode
     this.roomCode = this.props.match.params.roomCode;
     this.getRoomDetails();
   }
 
   getRoomDetails() {
-    fetch("/api/get-room" + "?code=" + this.roomCode)
+      // pass in room code to template string to call backend api for a given room code and dynamically display since
+      // when state is changed we'll re-render.
+    fetch(`/api/get-room?code=${this.roomCode}`)
       .then((response) => response.json())
       .then((data) => {
         this.setState({
