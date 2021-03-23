@@ -1,6 +1,10 @@
 from django.db import models
 import random, string
 
+# Create your models here.
+"""
+CALL python manage.py makemigrations in terminal whenever ANY of these models are updated before running server!!
+"""
 
 
 def generate_unique_code():
@@ -17,19 +21,16 @@ def generate_unique_code():
     return code
 
 
-# Create your models here.
-"""
-CALL python manage.py makemigrations in terminal whenever ANY of these models are updated before running server!!
-"""
-
-
 class Room(models.Model):
+    """
+    Room entity that drives our whole application. We store rooms in our SQL Lite DB. This is how we track the host,
+    person who created the room, their guests that join their room, the number of votes needed to skip a song, and if
+    a guest can pause a song.
+    """
     code = models.CharField(max_length=8, default=generate_unique_code, unique=True)
-    # cardinality is room can have only 1 host
+    # user can only be host of 1 room at a time.
     host = models.CharField(max_length=50, unique=True)
-    # non-null attribute, by default guest cannot pause music.
     guest_can_pause = models.BooleanField(null=False, default=False)
-    # number of votes needed to skip song.
     votes_to_skip = models.IntegerField(null=False, default=1)
     # automatically create a time stamp for when room is created (new entry in table)
     created_at = models.DateTimeField(auto_now_add=True)

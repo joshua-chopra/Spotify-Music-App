@@ -1,6 +1,10 @@
 from django.urls import path
 from .views import RoomView, CreateRoomView
 
+"""
+Deal with any urls starting with /api since project level (music-controller) directs URL requests with /api to this
+module, and we register the corresponding views of the DB here. 
+"""
 urlpatterns = [
     # register RoomView obj to home URL, returns serialized JSON format since we used serializer on our RoomView class.
     path('home/', RoomView.as_view()),

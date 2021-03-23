@@ -11,7 +11,7 @@ from rest_framework.response import Response
 class RoomView(generics.ListAPIView):
     # get all Room objects in the Room table
     queryset = Room.objects.all()
-    # use RoomSerializer to convert all the entries in the set to JSON
+    # use RoomSerializer to convert all the entries in the set to JSON to display at '/home' URL
     serializer_class = RoomSerializer
 
 

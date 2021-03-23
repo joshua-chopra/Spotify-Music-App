@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api.apps.ApiConfig',
-    'rest_framework',
+    'api.apps.ApiConfig',  # add our backend API
+    'rest_framework',  # added rest_framework
     'frontend.apps.FrontendConfig'
 ]
 
