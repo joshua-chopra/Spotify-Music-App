@@ -14,25 +14,29 @@ class RoomView(generics.ListAPIView):
     # use RoomSerializer to convert all the entries in the set to JSON to display at '/home' URL
     serializer_class = RoomSerializer
 
+
 class GetRoom(APIView):
     # use same serializer for RoomView
     serializer_class = RoomSerializer
-    # parameter sent over in URL
+    # parameter sent over in URL, we used ?code in front end url sent over, e.g., get-room?code={room.code}
     lookup_url_kwarg = 'code'
 
     def get(self, request, format=None):
+        # get code param from request since in format of room/:code
         code = request.GET.get(self.lookup_url_kwarg)
         if code:
             room = Room.objects.filter(code=code)
             if len(room) > 0:
                 data = RoomSerializer(room[0]).data
-                #
+                # add key:value pair to response data for is_host to use when setting state in Room component. we
+                # check the session key and see if it's equal to the host attribute for the room, since the host
+                # attribute in CreateRoomView below was assigned based on session key.
                 data['is_host'] = self.request.session.session_key == room[0].host
                 # return room to display,
                 return Response(data, status=status.HTTP_200_OK)
             return Response({'Room Not Found': 'Invalid Room Code.'}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'Bad Request': 'Code paramater not found in request'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Bad Request': 'Code parameter not found in request'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateRoomView(APIView):
@@ -56,6 +60,7 @@ class CreateRoomView(APIView):
             guest_can_pause = serializer.data.get('guest_can_pause')
             votes_to_skip = serializer.data.get('votes_to_skip')
             # if host already exists we don't want to create a new room, just change settings of the existing room.
+            # we assign session key from request received and we will use this later to check if current user is a host.
             host = self.request.session.session_key
             # get query set from host (unique attribute in model)
             queryset = Room.objects.filter(host=host)

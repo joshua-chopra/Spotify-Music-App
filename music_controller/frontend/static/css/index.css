@@ -7,17 +7,24 @@ html, body {
 
 /*wraps app div, fixed position no scroll bars and put at top left of page*/
 #main {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
 }
 
 /* recall use # to refer for elements with specific 'id', i.e., #id_name */
 #app {
-    width: 100%;
-    height: 100%;
-    /* components we're using make use of flexgrid in CSS. */
-    display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/*CLASS for div's we'll call "center", these div's are used to center content within it. (i.e., center content in
+ within any div named "class" */
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RoomView, CreateRoomView
+from .views import RoomView, CreateRoomView, GetRoom
 
 """
 Deal with any urls starting with /api since project level (music-controller) directs URL requests with /api to this
