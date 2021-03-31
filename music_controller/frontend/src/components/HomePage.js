@@ -1,30 +1,85 @@
-import React, {useState} from 'react'
+import React, { useEffect, useState } from "react";
 import RoomJoinPage from "./RoomJoinPage";
 import CreateRoomPage from "./CreateRoomPage";
 import Room from "./Room";
+import { Grid, Button, ButtonGroup, Typography } from "@material-ui/core";
 import {
-    BrowserRouter as Router,
-    Switch,
-    Route} from "react-router-dom";
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect,
+} from "react-router-dom";
 
 // functional component HomePage
 const HomePage = (props) => {
+    const [roomCode, setRoomCode] = useState(null);
+
+
+    // if roomcode changes, call useEffect to fetch code from backend
+    useEffect(() => {
+        async function checkUserInRoom() {
+            fetch("/api/user-in-room")
+                .then((response) => response.json())
+                .then((data) => {
+                    setRoomCode(data.code);
+                })
+        }
+        checkUserInRoom();
+    }, );
+
+    function clearRoomCode() {
+        setRoomCode(null);
+    }
+
+    function renderHomePage() {
+        return (
+            <Grid container spacing={3}>
+                <Grid item xs={12} align="center">
+                    <Typography variant="h3" compact="h3">
+                        House Party
+                    </Typography>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <ButtonGroup disableElevation variant="contained" color="primary">
+                        <Button color="primary" to="/join" component={Link}>
+                            Join a Room
+                        </Button>
+                        <Button color="secondary" to="/create" component={Link}>
+                            Create a Room
+                        </Button>
+                    </ButtonGroup>
+                </Grid>
+            </Grid>
+        );
+    }
+
     return (
         <Router>
             <Switch>
-                {/*use exact for only showing this html on root page*/}
-                {/* case 1 */}
-                <Route exact path="/">
-                    <p>This is the home page.</p>
-                </Route>
-                {/* case 2 */}
+                <Route
+                    exact
+                    path="/"
+                    render={() => {
+                        return roomCode ? (
+                            <Redirect to={`/room/${roomCode}`}/>) : (
+                            renderHomePage()
+                        );
+                    }}
+                />
                 <Route path="/join" component={RoomJoinPage}/>
-                {/* case 3 */}
                 <Route path="/create" component={CreateRoomPage}/>
-                {/* case 4 go to already created room, with params in URL */}
-                <Route path="/room/:roomCode" component={Room}/>
+                <Route
+                    path="/room/:roomCode"
+                    render={(props) => {
+                        // pass callback function that will be called in Room.js if user decides to leave the room,
+                        // will clear roomcode prop here.
+                        return <Room {...props} leaveRoomCallback={clearRoomCode}/>;
+                    }}
+                />
             </Switch>
         </Router>
     );
 }
 export default HomePage;
+

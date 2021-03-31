@@ -15,15 +15,11 @@ import {useHistory} from "react-router-dom";
 
 // rewrote into functional component
 const CreateRoomPage = (props) => {
-    const defaultVotes = 2;
-    const [guestCanPause, setGuestCanPause] = useState(true);
-    const [votesToSkip, setVotesToSkip] = useState(defaultVotes);
+    const [guestCanPause, setGuestCanPause] = useState('true');
+    const [votesToSkip, setVotesToSkip] = useState(2);
     // call hook at top level and use it within the functions we need, should call hooks at top level of component.
     const history = useHistory();
 
-    function handleVotesChange(event) {
-        setVotesToSkip(event.target.value);
-    }
 
     //  if guest can pause was set to true we want to allow pausing, else we'll set false.
     function handleGuestCanPauseChange(event) {
@@ -31,9 +27,6 @@ const CreateRoomPage = (props) => {
     }
 
     function handleRoomButtonPressed(event) {
-        // can't use hook in this function for some reason... probably because isn't a react function.
-        // let history = useHistory();
-        // console.log(history)
         const requestOptions = {
             method: "POST",
             // content type indicates request body format below is in JSON, (sending a JSON object key:value pairs), so
@@ -56,7 +49,7 @@ const CreateRoomPage = (props) => {
             // component which forces a redirect.
             .then((data) => {
                     // get history object from router.
-                    history.push("/room/" + data.code)
+                    history.push(`/room/${data.code}`)
                     console.log(data)
                 }
             );
@@ -83,8 +76,8 @@ const CreateRoomPage = (props) => {
                     </FormHelperText>
                     <RadioGroup
                         row
-                        defaultValue="true"
-                        onChange={handleGuestCanPauseChange}
+                        defaultValue={guestCanPause}
+                        onChange={(e) => setGuestCanPause(e.target.value === "true")}
                     >
                         <FormControlLabel
                             value="true"
@@ -134,8 +127,9 @@ const CreateRoomPage = (props) => {
                     <TextField
                         required={true}
                         type="number"
-                        onChange={handleVotesChange}
-                        defaultValue={defaultVotes}
+                        onChange={(e) =>
+                            setVotesToSkip(e.target.value)}
+                        defaultValue={votesToSkip}
                         inputProps={{
                             min: 1,
                             style: {textAlign: "center"},
