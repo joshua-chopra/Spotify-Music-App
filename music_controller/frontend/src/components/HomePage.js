@@ -22,10 +22,13 @@ const HomePage = (props) => {
             fetch("/api/user-in-room")
                 .then((response) => response.json())
                 .then((data) => {
+                    // console.log(data);
+                    // console.log("Got room code... as: " + data.code);
                     setRoomCode(data.code);
                 })
         }
         checkUserInRoom();
+        console.log("room code: " + roomCode);
     }, );
 
     function clearRoomCode() {
@@ -72,9 +75,10 @@ const HomePage = (props) => {
                 <Route
                     path="/room/:roomCode"
                     render={(props) => {
+                        console.log("Passing callback before returning Room comp...");
                         // pass callback function that will be called in Room.js if user decides to leave the room,
                         // will clear roomcode prop here.
-                        return <Room {...props} leaveRoomCallback={clearRoomCode}/>;
+                        return <Room {...props} leaveRoomCallBack={clearRoomCode}/>;
                     }}
                 />
             </Switch>

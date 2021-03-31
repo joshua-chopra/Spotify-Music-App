@@ -91,6 +91,8 @@ class CreateRoomView(APIView):
                 room.guest_can_pause, room.votes_to_skip = guest_can_pause, votes_to_skip
                 # pass fields that we need to update the room
                 room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
+                # ensure to save room code to user's session!
+                self.request.session['room_code'] = room.code
                 # let sender know room was updated, 200 - all good.
                 return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
             else:  # create new room w/ session key for this user
@@ -114,6 +116,7 @@ class UserInRoom(APIView):
         data = {
             'code': self.request.session.get('room_code')
         }
+        print(f"code is {data['code']}")
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
@@ -126,7 +129,7 @@ class LeaveRoom(APIView):
             # check if current user is the host of a room, if so, need to remove room from DB so it is not accesible.
             host_id = self.request.session.session_key
             room_results = Room.objects.filter(host=host_id)
-            if len(room_results) > 0:
+            if room_results.exists():
                 room = room_results[0]
                 room.delete()
 

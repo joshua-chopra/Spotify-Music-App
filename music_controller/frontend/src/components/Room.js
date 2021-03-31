@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import { Grid, Button, Typography } from "@material-ui/core";
+import HomePage from "./HomePage";
 
 
   const Room = (props) => {
@@ -29,7 +30,7 @@ import { Grid, Button, Typography } from "@material-ui/core";
               // redirect back to home.
               history.push('/');
           }
-          return response.json()
+          return response.json();
       })
       .then((data) => {
         setVotesToSkip(data.votes_to_skip);
@@ -45,7 +46,7 @@ import { Grid, Button, Typography } from "@material-ui/core";
       headers: { "Content-Type": "application/json" },
     };
     fetch("/api/leave-room", requestOptions).then((_response) => {
-      props.leaveRoomCallback();
+      props.leaveRoomCallBack();
       history.push("/");
     });
   }
