@@ -37,4 +37,14 @@ class CreateRoomSerializer(serializers.ModelSerializer):
 
 
 
+class UpdateRoomSerializer(serializers.ModelSerializer):
+    # we need to use the same code again, so when PATCH request comes in with a code we've already put into DB we do
+    # not want code to be validated against DB since we have a 'unique' constraint on code attribute, and we need to
+    # use the code (once serialized from JSON to python format) to update details of the room.
+    code = serializers.CharField(validators=[])
+
+    class Meta:
+        model = Room
+        fields = ('guest_can_pause', 'votes_to_skip', 'code')
+
 
