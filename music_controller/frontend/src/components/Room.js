@@ -33,6 +33,7 @@ const Room = (props) => {
     return (
       <Grid container spacing={1}>
         <Grid item xs={12} align="center">
+          {/*  currently using template of CreateRoomPage to allow user to edit room details. */}
           <CreateRoomPage
             update={true}
             votesToSkip={votesToSkip}

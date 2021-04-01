@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useState} from "react";
+import React, {useState} from "react";
 import {
     Button,
     Grid,
@@ -12,19 +12,17 @@ import {
 } from "@material-ui/core";
 import {Link} from "react-router-dom";
 import {useHistory} from "react-router-dom";
+import {Update} from "@material-ui/icons";
 
 // rewrote into functional component
 const CreateRoomPage = (props) => {
-    const [guestCanPause, setGuestCanPause] = useState('true');
+
+    // these also basically act as default props since we pass these as props from Room.js to display the settings page
+    // in Room.js by reusing this component, but check for props passed in at return () or use these values.
+    const [guestCanPause, setGuestCanPause] = useState("true");
     const [votesToSkip, setVotesToSkip] = useState(2);
     // call hook at top level and use it within the functions we need, should call hooks at top level of component.
     const history = useHistory();
-
-
-    //  if guest can pause was set to true we want to allow pausing, else we'll set false.
-    function handleGuestCanPauseChange(event) {
-        setGuestCanPause(event.target.value === "true");
-    }
 
     function handleRoomButtonPressed(event) {
         const requestOptions = {
@@ -55,16 +53,26 @@ const CreateRoomPage = (props) => {
             );
     }
 
-    const CreateARoom = () => {
+    // User view to dynamically display either create or update view (main difference is title and buttons)
+    const CreateOrUpdateRoom = () => {
         return (
             <React.Fragment>
+                <Title/>
+                <ControlRoom/>
+                <VotesToSkip/>
+                {props.update ? <UpdateRoomButtons/> : <CreateRoomButtons/>}
+            </React.Fragment>
+        )
+    }
+
+    const Title = () => {
+        return (
             <Grid item xs={12} align="center">
                 <Typography component="h4" variant="h4">
-                    Create A Room
+                    {props.update ? "Update Room" : "Create a Room"}
                 </Typography>
             </Grid>
-                </React.Fragment>
-        )
+        );
     }
 
     const ControlRoom = () => {
@@ -76,7 +84,7 @@ const CreateRoomPage = (props) => {
                     </FormHelperText>
                     <RadioGroup
                         row
-                        defaultValue={guestCanPause}
+                        defaultValue={props.guestCanPause ? props.guestCanPause.toString() : guestCanPause.toString()}
                         onChange={(e) => setGuestCanPause(e.target.value === "true")}
                     >
                         <FormControlLabel
@@ -96,29 +104,6 @@ const CreateRoomPage = (props) => {
             </Grid>
         )
     }
-
-    const RoomButtons = () => {
-        return (
-            // use react fragment to avoid adding div node to dom to wrap returning multiple elements
-            <React.Fragment>
-            <Grid item xs={12} align="center">
-                <Button
-                    color="primary"
-                    variant="contained"
-                    onClick={handleRoomButtonPressed}
-                >
-                    Create A Room
-                </Button>
-            </Grid>
-            <Grid item xs={12} align="center">
-                <Button color="secondary" variant="contained" to="/" component={Link}>
-                    Back
-                </Button>
-            </Grid>
-                </React.Fragment>
-        )
-    }
-
 
     const VotesToSkip = () => {
         return (
@@ -143,14 +128,46 @@ const CreateRoomPage = (props) => {
         )
     }
 
+    const CreateRoomButtons = () => {
+        return (
+            // use react fragment to avoid adding parent node to dom to wrap returning multiple elements
+            <React.Fragment>
+                <Grid item xs={12} align="center">
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={handleRoomButtonPressed}
+                    >
+                        Create A Room
+                    </Button>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <Button color="secondary" variant="contained" to="/" component={Link}>
+                        Back
+                    </Button>
+                </Grid>
+            </React.Fragment>
+        )
+    }
+
+    const UpdateRoomButtons = () => {
+        return (
+            <Grid item xs={12} align="center">
+                <Button
+                    color="primary"
+                    variant="contained"
+                    onClick=""
+                >
+                    Update Room
+                </Button>
+            </Grid>
+        );
+    }
+
 
     return (
         <Grid container spacing={2}>
-            {/* each grid item is separated into components*/}
-            <CreateARoom/>
-            <ControlRoom/>
-            <VotesToSkip/>
-            <RoomButtons/>
+            <CreateOrUpdateRoom/>
         </Grid>
     );
 }
