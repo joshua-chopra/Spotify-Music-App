@@ -7,7 +7,7 @@ from django.conf import settings
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'music_controller/music_controller.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'music_controller.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

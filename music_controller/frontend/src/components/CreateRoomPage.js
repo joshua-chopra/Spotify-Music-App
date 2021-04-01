@@ -8,11 +8,11 @@ import {
     FormControl,
     RadioGroup,
     FormControlLabel,
-    Radio
+    Radio, Collapse
 } from "@material-ui/core";
 import {Link} from "react-router-dom";
 import {useHistory} from "react-router-dom";
-import {Update} from "@material-ui/icons";
+import {Alert} from "@material-ui/lab";
 
 // rewrote into functional component
 const CreateRoomPage = (props) => {
@@ -21,6 +21,8 @@ const CreateRoomPage = (props) => {
     // in Room.js by reusing this component, but check for props passed in at return () or use these values.
     const [guestCanPause, setGuestCanPause] = useState("true");
     const [votesToSkip, setVotesToSkip] = useState(2);
+    const[successMsg, setSuccessMsg] = useState("");
+    const[errorMsg, setErrorMsg] = useState("");
     // call hook at top level and use it within the functions we need, should call hooks at top level of component.
     const history = useHistory();
 
@@ -53,17 +55,57 @@ const CreateRoomPage = (props) => {
             );
     }
 
-    // User view to dynamically display either create or update view (main difference is title and buttons)
-    const CreateOrUpdateRoom = () => {
+    function handleUpdateButtonPressed(event) {
+        const requestOptions = {
+            // making an update at UpdateRoom View (api/update-room)
+            method: "PATCH",
+            // content type indicates request body format below is in JSON, (sending a JSON object key:value pairs), so
+            // we let server know we're sending JSON object.
+            headers: {"Content-Type": "application/json"},
+            // pass current state of component to backend to create room with the current state of the component, i.e.
+            // what the user wants to create room with (# of votes to skip and if guest can pause)
+            body: JSON.stringify({
+                // need to make sure these names match what we look for in CreateRoomView on backend.
+                votes_to_skip: votesToSkip,
+                guest_can_pause: guestCanPause,
+                // will pass code as props from HomePage.
+                code: props.roomCode
+            }),
+        };
+        // call REST backend api for creating room, pass necessary content (votes, guest can pause) and for now just log
+        // the data, later we will redirect to the created room with associated page.
+        fetch("/api/update-room", requestOptions).then((response) => {
+              if (response.ok) {
+                  setSuccessMsg("Room updated successfully!");
+              } else {
+                  setErrorMsg("Error updating room...");
+              }
+              props.updateCallback();
+            });
+          }
+
+    const Messages = () => {
         return (
-            <React.Fragment>
-                <Title/>
-                <ControlRoom/>
-                <VotesToSkip/>
-                {props.update ? <UpdateRoomButtons/> : <CreateRoomButtons/>}
-            </React.Fragment>
-        )
+            <Grid container spacing={1}>
+                <Grid item xs={12} align="center">
+                    <Collapse in={errorMsg !== "" || successMsg !== ""}>
+                        {successMsg !== "" ? (
+                            <Alert severity="success" onClose={() => {setSuccessMsg("");}}>
+                                {successMsg}
+                            </Alert>
+                            )
+                            :
+                            (<Alert severity="error" onClose={() => {setErrorMsg("");}}>
+                                    {errorMsg}
+                            </Alert>
+                            )
+                        }
+                    </Collapse>
+                </Grid>
+            </Grid>);
     }
+
+
 
     const Title = () => {
         return (
@@ -156,7 +198,7 @@ const CreateRoomPage = (props) => {
                 <Button
                     color="primary"
                     variant="contained"
-                    onClick=""
+                    onClick={handleUpdateButtonPressed}
                 >
                     Update Room
                 </Button>
@@ -167,7 +209,11 @@ const CreateRoomPage = (props) => {
 
     return (
         <Grid container spacing={2}>
-            <CreateOrUpdateRoom/>
+            <Messages/>
+            <Title/>
+            <ControlRoom/>
+            <VotesToSkip/>
+            {props.update ? <UpdateRoomButtons/> : <CreateRoomButtons/>}
         </Grid>
     );
 }

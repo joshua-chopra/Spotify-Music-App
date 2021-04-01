@@ -26,10 +26,11 @@ const HomePage = (props) => {
                     // console.log("Got room code... as: " + data.code);
                     setRoomCode(data.code);
                 })
+            console.log("In homepage, checkUserInRoom completed...");
         }
         checkUserInRoom();
-        console.log("room code: " + roomCode);
-    }, );
+        console.log("In Homepage... room code: " + roomCode);
+    }, [roomCode]);
 
     function clearRoomCode() {
         setRoomCode(null);
@@ -75,7 +76,7 @@ const HomePage = (props) => {
                 <Route
                     path="/room/:roomCode"
                     render={(props) => {
-                        console.log("Passing callback before returning Room comp...");
+                        console.log("Passing callback in HomePage before returning Room comp...");
                         // pass callback function that will be called in Room.js if user decides to leave the room,
                         // will clear roomcode prop here.
                         return <Room {...props} leaveRoomCallBack={clearRoomCode}/>;

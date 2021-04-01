@@ -15,7 +15,7 @@ const Room = (props) => {
 
     useEffect(() => {
         getRoomDetails();
-    }, [votesToSkip, guestCanPause, isHost]);
+    }, []);
 
     function renderSettingsButton() {
         return (
@@ -30,29 +30,29 @@ const Room = (props) => {
     // we display settings page instead of usual Room page in the event that we have set "showSettings" state to true
     // when user clicks settings button, that only shows up when they are the host.
     const SettingsPage = () => {
-    return (
-      <Grid container spacing={1}>
-        <Grid item xs={12} align="center">
-          {/*  currently using template of CreateRoomPage to allow user to edit room details. */}
-          <CreateRoomPage
-            update={true}
-            votesToSkip={votesToSkip}
-            guestCanPause={guestCanPause}
-            roomCode={roomCode}
-            updateCallback={getRoomDetails}
-          />
-        </Grid>
-        <Grid item xs={12} align="center">
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setShowSettings(false)}
-          >
-            Close
-          </Button>
-        </Grid>
-      </Grid>
-    );
+        return (
+          <Grid container spacing={1}>
+            <Grid item xs={12} align="center">
+              {/*  currently using template of CreateRoomPage to allow user to edit room details. */}
+              <CreateRoomPage
+                update={true}
+                votesToSkip={votesToSkip}
+                guestCanPause={guestCanPause}
+                roomCode={roomCode}
+                updateCallback={getRoomDetails}
+              />
+            </Grid>
+            <Grid item xs={12} align="center">
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setShowSettings(false)}
+              >
+                Close
+              </Button>
+            </Grid>
+          </Grid>
+        );
   }
 
     function getRoomDetails() {
@@ -60,6 +60,7 @@ const Room = (props) => {
         // when state is changed we'll re-render.
         fetch(`/api/get-room?code=${roomCode}`)
             .then((response) => {
+                console.log("In Room.js called getRoomDetails....");
                 // we do not want to render Room.js component if there is no room to display! data will not have attributes
                 // that we are looking for (votes to skip, guest can pause, etc.)
                 if (!response.ok) {
@@ -90,14 +91,10 @@ const Room = (props) => {
         });
     }
 
-    if (showSettings) {
+    const RoomView = () => {
         return (
-            <SettingsPage/>
-        );
-    }
-    return (
-        <Grid container spacing={1}>
-            <Grid item xs={12} align="center">
+            <React.Fragment>
+                <Grid item xs={12} align="center">
                 <Typography variant="h4" component="h4">
                     Code: {roomCode}
                 </Typography>
@@ -117,8 +114,12 @@ const Room = (props) => {
                     Host: {isHost.toString()}
                 </Typography>
             </Grid>
-            {/* if user is host we'll show button, otherwise we won't.*/}
-            {isHost ? renderSettingsButton() : null}
+            </React.Fragment>
+        );
+    }
+
+    const LeaveButton = () => {
+        return (
             <Grid item xs={12} align="center">
                 <Button
                     variant="contained"
@@ -128,6 +129,20 @@ const Room = (props) => {
                     Leave Room
                 </Button>
             </Grid>
+        );
+    }
+
+    if (showSettings) {
+        return (
+            <SettingsPage/>
+        );
+    }
+    return (
+        <Grid container spacing={1}>
+            <RoomView/>
+            {/* if user is host we'll show button, otherwise we won't.*/}
+            {isHost ? renderSettingsButton() : null}
+            <LeaveButton/>
         </Grid>
     );
 }
