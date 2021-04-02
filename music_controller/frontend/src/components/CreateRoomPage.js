@@ -77,9 +77,11 @@ const CreateRoomPage = (props) => {
         fetch("/api/update-room", requestOptions).then((response) => {
               if (response.ok) {
                   setSuccessMsg("Room updated successfully!");
+                  console.log("setting success message............");
               } else {
                   setErrorMsg("Error updating room...");
               }
+              console.log("Before callback, set success message to: " + successMsg);
               props.updateCallback();
             });
           }
@@ -87,6 +89,10 @@ const CreateRoomPage = (props) => {
     const Messages = () => {
         return (
             <Grid container spacing={1}>
+                {console.log("messages component being displayed......")}
+                {console.log("do we have an error msg?: [ " + errorMsg + " ]")}
+                {console.log("do we have a success msg?: [ " + successMsg + " ]")}
+                {console.log("What is value of update?: " + props.update )}
                 <Grid item xs={12} align="center">
                     <Collapse in={errorMsg !== "" || successMsg !== ""}>
                         {successMsg !== "" ? (

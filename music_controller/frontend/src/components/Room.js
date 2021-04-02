@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import {Grid, Button, Typography} from "@material-ui/core";
 import CreateRoomPage from "./CreateRoomPage";
@@ -55,7 +55,7 @@ const Room = (props) => {
         );
   }
 
-    function getRoomDetails() {
+    const getRoomDetails = useCallback(() => {
         // pass in room code to template string to call backend api for a given room code and dynamically display since
         // when state is changed we'll re-render.
         fetch(`/api/get-room?code=${roomCode}`)
@@ -78,7 +78,7 @@ const Room = (props) => {
                 setIsHost(data.is_host);
             });
 
-    }
+    }, []);
 
     function leaveButtonPressed() {
         const requestOptions = {
