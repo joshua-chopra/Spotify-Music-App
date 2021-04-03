@@ -1,3 +1,4 @@
 /venv/
 /music_controller/frontend/node_modules/
 /music_controller/api/migrations/
+/music_controller/db.sqlite3
