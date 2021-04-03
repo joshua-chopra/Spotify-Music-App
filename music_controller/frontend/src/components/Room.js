@@ -33,20 +33,23 @@ const Room = (props) => {
         return (
           <Grid container spacing={1}>
             <Grid item xs={12} align="center">
-              {/*  currently using template of CreateRoomPage to allow user to edit room details. */}
+              {/*  currently using template of CreateRoomPage to allow user to edit room details. removed callback */}
               <CreateRoomPage
                 update={true}
                 votesToSkip={votesToSkip}
                 guestCanPause={guestCanPause}
                 roomCode={roomCode}
-                updateCallback={getRoomDetails}
               />
             </Grid>
             <Grid item xs={12} align="center">
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => setShowSettings(false)}
+                // once user closes settings page, re-fetch room details to display and don't show settings page (re-render)
+                onClick={() => {
+                    getRoomDetails();
+                    setShowSettings(false);
+                }}
               >
                 Close
               </Button>

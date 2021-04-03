@@ -15,7 +15,7 @@ import {useHistory} from "react-router-dom";
 import {Alert} from "@material-ui/lab";
 
 // rewrote into functional component
-const CreateRoomPage = (props) => {
+const CreateRoomPage = props => {
 
     // these also basically act as default props since we pass these as props from Room.js to display the settings page
     // in Room.js by reusing this component, but check for props passed in at return () or use these values.
@@ -82,7 +82,9 @@ const CreateRoomPage = (props) => {
                   setErrorMsg("Error updating room...");
               }
               console.log("Before callback, set success message to: " + successMsg);
-              props.updateCallback();
+              // removed callback function, causing parent child issues w/ re-rendering, just re-render room on
+            // settings page close button clicked to update view on room settings for user.
+              // props.updateCallback();
             });
           }
 
