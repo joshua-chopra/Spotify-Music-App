@@ -28,7 +28,7 @@ class GetRoom(APIView):
         if code:
             room = Room.objects.filter(code=code)
             if len(room) > 0:
-                data = RoomSerializer(room[0]).data
+                data = RoomSerializer(room.first()).data
                 # add key:value pair to response data for is_host to use when setting state in Room component. we
                 # check the session key and see if it's equal to the host attribute for the room, since the host
                 # attribute in CreateRoomView below was assigned based on session key.

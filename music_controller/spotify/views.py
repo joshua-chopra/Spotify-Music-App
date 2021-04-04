@@ -71,13 +71,13 @@ class CurrentSong(APIView):
     displayed on Room.js page.
     """
     def get(self, request, format=None):
-        print("In current_song view", os.getcwd())
         room_code = self.request.session.get('room_code')
         room = Room.objects.filter(code=room_code)
         # check that we actually have a room we are working with before attempting to call API
         if room.exists():
             room = room.first()
         else:
+            # print(f"room code is: {room_code} and room.exists={room.exists}")
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         host = room.host
         # will append this endpoint to the base url defined in util.py to call spotify API
@@ -85,8 +85,11 @@ class CurrentSong(APIView):
         # use helper func from util.py to execute any spotify requests needed.
         response = execute_spotify_api_request(host, endpoint)
 
+
         if 'error' in response or 'item' not in response:
+            print("In views.py error response is: ", response)
             return Response({}, status=status.HTTP_204_NO_CONTENT)
+
 
         # response is JSON mapped to python dict, use same operations
         item = response.get('item')
@@ -118,3 +121,18 @@ class CurrentSong(APIView):
         }
 
         return Response(song, status=status.HTTP_200_OK)
+
+
+class ControlSong(APIView):
+    def put(self, response, format=None):
+        action = self.request.headers['Action'].lower()
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.filter(code=room_code).first()
+        if self.request.session.session_key == room.host or room.guest_can_pause:
+            if action == 'pause':
+                control_song(room.host, 'pause')
+            else:
+                control_song(room.host, 'play')
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)

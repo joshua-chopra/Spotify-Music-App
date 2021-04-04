@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import {Grid, Button, Typography} from "@material-ui/core";
 import CreateRoomPage from "./CreateRoomPage";
+import MusicPlayer from "./MusicPlayer";
 
 
 const Room = (props) => {
@@ -15,6 +16,8 @@ const Room = (props) => {
     const history = useHistory();
 
 
+    // mimic componentDidMount behavior by passing empty dependencies array, we only need to get details on load and
+    // register function to run every 1000 seconds.
     useEffect(() => {
         getRoomDetails();
         const interval = setInterval(() => {getCurrentSong();}, 1000);
@@ -145,6 +148,8 @@ const Room = (props) => {
                     Code: {roomCode}
                 </Typography>
             </Grid>
+                {/* pass in k:v pairs of song object as separate props using spread operator */}
+                <MusicPlayer {...song}/>
             {/*<Grid item xs={12} align="center">*/}
             {/*    <Typography variant="h6" component="h6">*/}
             {/*        Votes: {votesToSkip}*/}
