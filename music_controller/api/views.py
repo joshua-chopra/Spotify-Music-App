@@ -93,11 +93,13 @@ class CreateRoomView(APIView):
                 room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
                 # ensure to save room code to user's session!
                 self.request.session['room_code'] = room.code
-                print('saved room code as', self.request.session['room_code'])
+                # print('saved room code as', self.request.session['room_code'])
                 # let sender know room was updated, 200 - all good.
                 return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
             else:  # create new room w/ session key for this user
                 room = Room(host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
+                # ensure to save room code to user's session, we need to parse this from request later!
+                self.request.session['room_code'] = room.code
                 room.save()
                 # return response with serialized room object DATA (cannot pass serializer object)
                 # to sender of the POST request.
