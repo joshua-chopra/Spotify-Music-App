@@ -1,9 +1,12 @@
 from django.urls import path
 from .views import index
 
+app_name = 'frontend'
+
 urlpatterns = [
-    # register index function (which will render index.html template) to all routes.
-    path('', index),
+    # register index function (which will render index.html template) to all routes. give name so when we call
+    # redirect("frontend:") [i.e., empty string after the :] in spotify.views.py we get redirected here, then homepage.
+    path('', index, name=""),
     # RoomJoinPage is called through the chain of events frontend/views.index -> render index.html -> render HomePage
     # -> which passes URL to router, which finds exact path for /join which renders RoomJoinPage.js.
     path('join', index),

@@ -10,6 +10,7 @@ const Room = (props) => {
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
     const history = useHistory();
 
 
@@ -58,7 +59,7 @@ const Room = (props) => {
         );
   }
 
-    const getRoomDetails = useCallback(() => {
+    function getRoomDetails() {
         // pass in room code to template string to call backend api for a given room code and dynamically display since
         // when state is changed we'll re-render.
         fetch(`/api/get-room?code=${roomCode}`)
@@ -79,9 +80,31 @@ const Room = (props) => {
                 setVotesToSkip(data.votes_to_skip);
                 setGuestCanPause(data.guest_can_pause);
                 setIsHost(data.is_host);
+                console.log("Is the person host..?  [ " + data.is_host + "]");
+                if (data.is_host) {
+                    authenticateSpotify();
+                }
             });
 
-    }, []);
+
+    }
+
+    function authenticateSpotify() {
+        console.log("Calling authenticate spotify....");
+        fetch("/spotify/is-authenticated")
+          .then((response) => response.json())
+          .then((data) => {
+            setSpotifyAuthenticated(data.status);
+            console.log(data.status);
+            if (!data.status) {
+              fetch("/spotify/get-auth-url")
+                .then((response) => response.json())
+                .then((data) => {
+                  window.location.replace(data.url);
+                });
+            }
+          });
+      }
 
     function leaveButtonPressed() {
         const requestOptions = {

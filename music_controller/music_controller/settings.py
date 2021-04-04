@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',  # add our backend API
     'rest_framework',  # added rest_framework
-    'frontend.apps.FrontendConfig'
+    'frontend.apps.FrontendConfig',
+    'spotify.apps.SpotifyConfig'  # spotify app used for user authentication.
 ]
 
 MIDDLEWARE = [

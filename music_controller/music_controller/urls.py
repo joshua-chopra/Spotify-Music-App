@@ -21,5 +21,6 @@ urlpatterns = [
     # dispatch any urls over to api.urls for that module to handle the url request
     path('api/', include('api.urls')),
     # whenever we have a url with no prefix (front end has its own urls) we want frontend.urls to deal w/ it.
-    path('', include('frontend.urls'))
+    path('', include('frontend.urls')),
+    path('spotify/', include('spotify.urls'))
 ]
