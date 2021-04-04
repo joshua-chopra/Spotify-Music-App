@@ -3,12 +3,13 @@ from rest_framework.views import APIView
 from requests import Request, post
 from rest_framework import status
 from rest_framework.response import Response
-from .util import update_or_create_user_tokens, is_spotify_authenticated, get_user_tokens, execute_spotify_api_call
+from .util import *
 import os
+from api.models import Room
 
 
 class AuthURL(APIView):
-    def get(self, request, fornat=None):
+    def get(self, request, format=None):
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
 
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
@@ -23,7 +24,11 @@ class AuthURL(APIView):
 
 def spotify_callback(request, format=None):
     """
-    Invoke this function after we get authentication from spotify to get the needed tokens for a user.
+    Pass this function as a param in our request above in AUTHURL so once spotify authenticates a user (on spotify.com)
+    the redirect goes to "spotify/redirect" on our server which is registered to this func, and we'll use this callback
+    func to get the tokens we need, put them in our db, and redirect user BACK to the front end. So, the flow is:
+
+    front_end (room) -> spotify.com -> spotify_callback @ spotify/redirect -> front_end (room)
     """
     code = request.GET.get('code')
     error = request.GET.get('error')
@@ -58,3 +63,58 @@ class IsAuthenticated(APIView):
     def get(self, request, format=None):
         is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
+
+
+class CurrentSong(APIView):
+    """
+    Use this view to query spotify API for current song and return info about current song to front end so it can be
+    displayed on Room.js page.
+    """
+    def get(self, request, format=None):
+        print("In current_song view", os.getcwd())
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.filter(code=room_code)
+        # check that we actually have a room we are working with before attempting to call API
+        if room.exists():
+            room = room.first()
+        else:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        host = room.host
+        # will append this endpoint to the base url defined in util.py to call spotify API
+        endpoint = "player/currently-playing"
+        # use helper func from util.py to execute any spotify requests needed.
+        response = execute_spotify_api_request(host, endpoint)
+
+        if 'error' in response or 'item' not in response:
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        # response is JSON mapped to python dict, use same operations
+        item = response.get('item')
+        duration = item.get('duration_ms')
+        progress = response.get('progress_ms')
+        # [0] is largest image returned for the abum
+        album_cover = item.get('album').get('images')[0].get('url')
+        is_playing = response.get('is_playing')
+        song_id = item.get('id')
+
+        artist_string = ""
+
+        # build up a string with multiple artists if a song has more than 1 artist.
+        for i, artist in enumerate(item.get('artists')):
+            if i > 0:
+                artist_string += ", "
+            name = artist.get('name')
+            artist_string += name
+
+        song = {
+            'title': item.get('name'),
+            'artist': artist_string,
+            'duration': duration,
+            'time': progress,
+            'image_url': album_cover,
+            'is_playing': is_playing,
+            'votes': 0,
+            'id': song_id
+        }
+
+        return Response(song, status=status.HTTP_200_OK)

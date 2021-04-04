@@ -11,12 +11,31 @@ const Room = (props) => {
     const [isHost, setIsHost] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
+    const [song, setSong] = useState({});
     const history = useHistory();
 
 
     useEffect(() => {
         getRoomDetails();
+        const interval = setInterval(() => {getCurrentSong();}, 1000);
+        // return new function for cleanup of component, equivalent to componentWillUnmount from class
+        return () => clearInterval(interval);
     }, []);
+
+    function getCurrentSong() {
+        fetch("/spotify/current-song")
+          .then((response) => {
+            if (!response.ok) {
+              return {};
+            } else {
+              return response.json();
+            }
+          })
+          .then((data) => {
+            setSong(data);
+            console.log(data);
+          });
+  }
 
     function renderSettingsButton() {
         return (
@@ -81,6 +100,7 @@ const Room = (props) => {
                 setGuestCanPause(data.guest_can_pause);
                 setIsHost(data.is_host);
                 console.log("Is the person host..?  [ " + data.is_host + "]");
+                // set state is asynchronous, so immediately checking won't necessarily return updated state.
                 if (data.is_host) {
                     authenticateSpotify();
                 }
@@ -125,21 +145,21 @@ const Room = (props) => {
                     Code: {roomCode}
                 </Typography>
             </Grid>
-            <Grid item xs={12} align="center">
-                <Typography variant="h6" component="h6">
-                    Votes: {votesToSkip}
-                </Typography>
-            </Grid>
-            <Grid item xs={12} align="center">
-                <Typography variant="h6" component="h6">
-                    Guest Can Pause: {guestCanPause.toString()}
-                </Typography>
-            </Grid>
-            <Grid item xs={12} align="center">
-                <Typography variant="h6" component="h6">
-                    Host: {isHost.toString()}
-                </Typography>
-            </Grid>
+            {/*<Grid item xs={12} align="center">*/}
+            {/*    <Typography variant="h6" component="h6">*/}
+            {/*        Votes: {votesToSkip}*/}
+            {/*    </Typography>*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={12} align="center">*/}
+            {/*    <Typography variant="h6" component="h6">*/}
+            {/*        Guest Can Pause: {guestCanPause.toString()}*/}
+            {/*    </Typography>*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={12} align="center">*/}
+            {/*    <Typography variant="h6" component="h6">*/}
+            {/*        Host: {isHost.toString()}*/}
+            {/*    </Typography>*/}
+            {/*</Grid>*/}
             </React.Fragment>
         );
     }
