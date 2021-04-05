@@ -87,7 +87,7 @@ class CreateRoomView(APIView):
             # get query set from host (unique attribute in model)
             queryset = Room.objects.filter(host=host)
             if queryset.exists():
-                room = queryset[0]
+                room = queryset.first()
                 room.guest_can_pause, room.votes_to_skip = guest_can_pause, votes_to_skip
                 # pass fields that we need to update the room
                 room.save(update_fields=['guest_can_pause', 'votes_to_skip'])

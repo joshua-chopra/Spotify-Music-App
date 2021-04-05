@@ -20,7 +20,7 @@ const Room = (props) => {
     // register function to run every 1000 seconds.
     useEffect(() => {
         getRoomDetails();
-        const interval = setInterval(() => {getCurrentSong();}, 1000);
+        const interval = setInterval(() => {getCurrentSong()}, 1000);
         // return new function for cleanup of component, equivalent to componentWillUnmount from class
         return () => clearInterval(interval);
     }, []);

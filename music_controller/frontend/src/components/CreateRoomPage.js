@@ -19,7 +19,7 @@ const CreateRoomPage = props => {
 
     // these also basically act as default props since we pass these as props from Room.js to display the settings page
     // in Room.js by reusing this component, but check for props passed in at return () or use these values.
-    const [guestCanPause, setGuestCanPause] = useState("true");
+    const [guestCanPause, setGuestCanPause] = useState(props.guestCanPause);
     const [votesToSkip, setVotesToSkip] = useState(2);
     const[successMsg, setSuccessMsg] = useState("");
     const[errorMsg, setErrorMsg] = useState("");
@@ -164,7 +164,8 @@ const CreateRoomPage = props => {
                         type="number"
                         onChange={(e) =>
                             setVotesToSkip(e.target.value)}
-                        defaultValue={votesToSkip}
+                        /*remove defaultValue*/
+                        value={votesToSkip}
                         inputProps={{
                             min: 1,
                             style: {textAlign: "center"},
