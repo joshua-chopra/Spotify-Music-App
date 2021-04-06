@@ -14,7 +14,16 @@ const MusicPlayer = (props) => {
 
     const songProgress = (props.time / props.duration) * 100;
 
+    function skipSong() {
+        const requestOptions = {
+            method: "POST",
+            headers: {"Content-Type": "application/json"}
+        };
+        fetch("/spotify/skip", requestOptions);
+    }
+
     function controlSong(action) {
+        console.log("Calling controlSong & action is: " + action);
         const requestOptions = {
             method: "PUT",
             headers: {"Content-Type": "application/json", "Action": action},
@@ -44,7 +53,7 @@ const MusicPlayer = (props) => {
                             {props.is_playing ? <PauseIcon/> : <PlayArrowIcon/>}
                         </IconButton>
                         <IconButton>
-                            <SkipNextIcon/>
+                            <SkipNextIcon onClick={skipSong}/>
                         </IconButton>
                     </div>
                 </Grid>
