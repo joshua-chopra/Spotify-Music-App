@@ -77,7 +77,7 @@ const HomePage = (props) => {
                     path="/room/:roomCode"
                     render={(props) => {
                         console.log("Passing callback in HomePage before returning Room comp...");
-                        // pass callback function that will be called in Room.js if user decides to leave the room,
+                        // pass callback function that will be called in RoomFCOrig.js if user decides to leave the room,
                         // will clear roomcode prop here.
                         return <Room {...props} leaveRoomCallBack={clearRoomCode}/>;
                     }}

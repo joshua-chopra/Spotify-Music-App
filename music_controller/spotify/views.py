@@ -70,7 +70,7 @@ class IsAuthenticated(APIView):
 class CurrentSong(APIView):
     """
     Use this view to query spotify API for current song and return info about current song to front end so it can be
-    displayed on Room.js page.
+    displayed on RoomFCOrig.js page.
     """
 
     def get(self, request, format=None):
