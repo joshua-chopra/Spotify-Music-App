@@ -55,6 +55,7 @@ const Room = (props) => {
     // we display settings page instead of usual Room page in the event that we have set "showSettings" state to true
     // when user clicks settings button, that only shows up when they are the host.
     const SettingsPage = () => {
+        console.log("triggering re-render of settings page....");
         return (
           <Grid container spacing={1}>
             <Grid item xs={12} align="center">
