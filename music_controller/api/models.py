@@ -34,3 +34,5 @@ class Room(models.Model):
     votes_to_skip = models.IntegerField(null=False, default=1)
     # automatically create a time stamp for when room is created (new entry in table)
     created_at = models.DateTimeField(auto_now_add=True)
+    # store currently playing song so we can access this in Votes DB.
+    current_song = models.CharField(null=True, max_length=50)

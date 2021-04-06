@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .util import *
 import os
 from api.models import Room
+from .models import Vote
 
 
 class AuthURL(APIView):
@@ -60,6 +61,7 @@ class IsAuthenticated(APIView):
     """
     Use endpoint to see if user is authenticated.
     """
+
     def get(self, request, format=None):
         is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
@@ -70,6 +72,7 @@ class CurrentSong(APIView):
     Use this view to query spotify API for current song and return info about current song to front end so it can be
     displayed on Room.js page.
     """
+
     def get(self, request, format=None):
         room_code = self.request.session.get('room_code')
         room = Room.objects.filter(code=room_code)
@@ -85,11 +88,9 @@ class CurrentSong(APIView):
         # use helper func from util.py to execute any spotify requests needed.
         response = execute_spotify_api_request(host, endpoint)
 
-
         if 'error' in response or 'item' not in response:
             print("In views.py error response is: ", response)
             return Response({}, status=status.HTTP_204_NO_CONTENT)
-
 
         # response is JSON mapped to python dict, use same operations
         item = response.get('item')
@@ -109,6 +110,7 @@ class CurrentSong(APIView):
             name = artist.get('name')
             artist_string += name
 
+        votes = len(Vote.objects.filter(room=room, song_id=song_id))
         song = {
             'title': item.get('name'),
             'artist': artist_string,
@@ -116,11 +118,26 @@ class CurrentSong(APIView):
             'time': progress,
             'image_url': album_cover,
             'is_playing': is_playing,
-            'votes': 0,
+            'votes': votes,
+            'votes_required_to_skip': room.votes_to_skip,
             'id': song_id
         }
 
+        # update room w/ song ID we are currently playing if needed & remove all votes from any previous song
+        self.update_room_song(room, song_id)
+
         return Response(song, status=status.HTTP_200_OK)
+
+    def update_room_song(self, room, song_id):
+        """
+        Helper function to ensure we avoid expensive operation of updating DB if we already have the correct song
+        mapped to the room we are in
+        """
+        if room.current_song != song_id:
+            room.current_song = song_id
+            room.save(update_fields=['current_song'])
+            # get set of votes with the current song as foreign key and delete all of them since we are on a new song.
+            Vote.objects.filter(room=room).delete()
 
 
 class ControlSong(APIView):
@@ -144,8 +161,20 @@ class SkipSong(APIView):
     def post(self, request, format=None):
         room_code = self.request.session.get('room_code')
         room = Room.objects.filter(code=room_code).first()
+        # add 1 to running total number of votes for the currently playing song since this post request means someone
+        # is sending a request to skip, i.e., adding a vote to skip to the DB.
+        votes = Vote.objects.filter(room=room, song_id=room.current_song)
+        current_votes_to_skip = len(votes) + 1
+        # num votes needed to skip song based on when room was created
+        votes_needed = room.votes_to_skip
 
-        if self.request.session.session_key == room.host:
+        if self.request.session.session_key == room.host or current_votes_to_skip >= votes_needed:
+            # before skipping song, remove all votes in DB mapped to current song for room since no longer needed.
+            votes.delete()
             skip_song(room.host)
+        else:  # otherwise create a new vote
+            vote = Vote(user=self.request.session.session_key, room=room, song_id=room.current_song)
+            # save vote to DB
+            vote.save()
 
         return Response({}, status.HTTP_204_NO_CONTENT)
